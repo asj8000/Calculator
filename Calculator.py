@@ -6,72 +6,22 @@ layout.title('계산기')
 entry = tk.Entry(layout, width=30)
 entry.grid(column = 0, row = 0, columnspan = 4, ipady = 20)
 
-button = tk.Button(layout, 
-    text = 1, 
-    width = 5, 
-    height = 2,
-    bg = 'gray',
-    fg = 'black'
-)
-button.grid(column = 0, row = 1)
-button = tk.Button(layout, 
-    text = 2, 
-    width = 5, 
-    height = 2,
-    bg = 'gray',
-    fg = 'black'
-)
-button.grid(column = 1, row = 1)
-button = tk.Button(layout, 
-    text = 3, 
-    width = 5, 
-    height = 2,
-    bg = 'gray',
-    fg = 'black'
-)
-button.grid(column = 2, row = 1)
-button = tk.Button(layout, 
-    text = 4, 
-    width = 5, 
-    height = 2,
-    bg = 'gray',
-    fg = 'black'
-)
-button.grid(column = 3, row = 1)
+layoutIndex = [
+    ["1","2","3","4"],
+    ["5","6","7","8"],
+    ["9","2","3","4"]
+]
 
-
-button = tk.Button(layout, 
-    text = 5, 
-    width = 5, 
-    height = 2,
-    bg = 'gray',
-    fg = 'black'
-)
-button.grid(column = 0, row=2)
-button = tk.Button(layout, 
-    text = 6, 
-    width = 5, 
-    height = 2,
-    bg = 'gray',
-    fg = 'black'
-)
-button.grid(column = 1, row=2)
-button = tk.Button(layout, 
-    text = 7, 
-    width = 5, 
-    height = 2,
-    bg = 'gray',
-    fg = 'black'
-)
-button.grid(column = 2, row=2)
-button = tk.Button(layout, 
-    text = 8, 
-    width = 5, 
-    height = 2,
-    bg = 'gray',
-    fg = 'black'
-)
-button.grid(column = 3, row=2)
+for i, layerDetail in enumerate(layoutIndex):
+    for k, value in enumerate(layerDetail):
+        button = tk.Button(layout, 
+            text = value, 
+            width = 10, 
+            height = 3,
+            bg = 'gray',
+            fg = 'black'
+        )
+        button.grid(column = k, row = (i + 1))
 
 
 layout.mainloop()
