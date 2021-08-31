@@ -1,32 +1,83 @@
 import tkinter as tk
 
+historyValue = ''
+lastValue = ''
+inputValue = 0
+calculatedValue = 0
+actionStatus = 0
+
 def clickFunc(value):
     if value.isdigit():
-        enterCommand(value)
-    else:
         enterNumber(value)
-
-def enterCommand(value):
-    print(value)
+    else:
+        enterCommand(value)
 
 def enterNumber(value):
-    print(value)
+    global inputValue, actionStatus
+    if actionStatus == 1 :
+        print('z')
+        inputValue = int(value)
+        inputVisibleValue.set(str(value))
+    else:
+        print('a')
+        inputValue = (inputValue*10) + int(value)
+        inputVisibleValue.set(str(inputValue))
+    actionStatus = 0
 
+def enterCommand(Command):
+    global historyValue, lastValue, inputValue, calculatedValue, actionStatus
 
+    calculationCommentList = ['+','-','x','/','=']
+    if Command in calculationCommentList:
+        if actionStatus == 1:
+            inputValue = calculation(Command)
+            historyValue = lastValue + " " + str(inputValue) + " " + Command
+            historyVisibleValue.set(str(historyValue))
+            inputVisibleValue.set(inputValue)
+        else:
+            inputValue = calculation(Command)
+            lastValue = historyValue
+            historyValue = historyValue + " " + str(inputValue) + " " + Command
+            historyVisibleValue.set(str(historyValue))
+            inputVisibleValue.set(inputValue)
+        actionStatus = 1
 
+def calculation(Command):
+    global historyValue, lastValue, inputValue, calculatedValue, actionStatus
+    
+    if calculatedValue == 0:
+        result = inputValue
+    elif Command == "+":
+        result = calculatedValue + inputValue
+    elif Command == "-":
+        result = calculatedValue - inputValue
+    elif Command == "x":
+        result = calculatedValue * inputValue
+    elif Command == "/":
+        result = calculatedValue / inputValue
+    else:
+        result = '???'
 
+    return result
 
+#GUI 그리기 시작
 layout = tk.Tk()
 layout.title('계산기')
+layout.resizable(False,False)
 
-entryaa = tk.Entry(layout, width=30, state="disable")
-entryaa.grid( columnspan = 4, ipady = 10, ipadx=30)
-inputEntry = tk.Entry(layout, width=30)
-inputEntry.grid( columnspan = 4, ipady = 10, ipadx=30)
+historyVisibleValue = tk.StringVar()
+historyVisibleValue.set(str(historyValue))
+histroyArea = tk.Entry(layout, textvariable=historyVisibleValue, state="disable", justify="right")
+histroyArea.grid( column=0, row=0, columnspan = 4, ipadx=80,  ipady = 10)
+
+inputVisibleValue = tk.StringVar()
+inputVisibleValue.set(str(inputValue))
+inputArea = tk.Entry(layout, textvariable=inputVisibleValue, justify="right")
+inputArea.grid(column=0, row=1, columnspan=4, ipadx=80, ipady=30)
 
 layoutIndex = [
-    ["%","CE","C","<-"],
-    ["1/x","x2","2/x","/"],
+    ["","","","<-"],
+    ["C","CE","( )","/"],
     ["7","8","9","x"],
     ["4","5","6","-"],
     ["1","2","3","+"],
