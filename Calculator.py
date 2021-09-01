@@ -4,10 +4,12 @@ import tkinter as tk
 historyValue = ''
 #이전 히스토리 값
 lastValue = ''
+
 #현재 입력된 값
 inputValue = 0
 #현재 작동
 actionStatus = 0
+
 
 #버튼 클릭 시 작동
 def clickFunc(value):
@@ -19,14 +21,20 @@ def clickFunc(value):
 #숫자 입력 시 작동 함수
 def enterNumber(value):
     global inputValue, actionStatus
+    # 현재 무슨 동작을 하고 있냐(actionStatus)를 받아와서
+    # 연산자 다음으로 입력되는 숫자일 경우 인풋 창 지우고 새로 입력
     if actionStatus == 1 :
-        # 현재 무슨 동작을 하고 있냐(actionStatus)를 받아와서
-        # 연산자 다음으로 입력되는 숫자일 경우 인풋 창 지우고 새로 입력
         inputValue = int(value)
         inputVisibleValue.set(str(value))
         actionStatus = 0
+    # 식 종료 다음으로 입력되는 숫자일 경우 전부 지우고 새로 입력
+    elif actionStatus == 2:
+        clearCommand()
+        inputValue = int(value)
+        inputVisibleValue.set(str(value))
+        actionStatus = 0
+    # 숫자를 처음 or 연속으로 입력할 경우 기존 숫자에 다음에 추가
     else:
-        # 숫자를 처음 or 연속으로 입력할 경우.
         inputValue = (inputValue*10) + int(value)
         inputVisibleValue.set(str(inputValue))
 
@@ -34,9 +42,18 @@ def enterNumber(value):
 def enterCommand(Command):
     global historyValue, lastValue, inputValue, actionStatus
 
+    if actionStatus == 2:
+        beforeResult = inputValue
+        clearCommand()
+        historyValue = str(beforeResult) + " " + Command
+        historyVisibleValue.set(str(historyValue))
+        inputVisibleValue.set(int(0))
+        return
+
     #사칙연산 커멘드일 경우
-    calculationCommentList = ['+','-','x','/']
+    calculationCommentList = ['+','-','*','/']
     if Command in calculationCommentList:
+        #커멘드를 연속으로 입력할 경우 예외처리
         if actionStatus == 1:
             historyValue = lastValue + " " + str(inputValue) + " " + Command
             historyVisibleValue.set(str(historyValue))
@@ -44,8 +61,15 @@ def enterCommand(Command):
             lastValue = historyValue
             historyValue = historyValue + " " + str(inputValue) + " " + Command
             historyVisibleValue.set(str(historyValue))
-            inputVisibleValue.set(int(calculation(0)))
+            inputVisibleValue.set(int(0))
         actionStatus = 1
+    #연산( = ) 커멘드일 경우
+    elif Command == '=':
+        historyValue = historyValue + " " + str(inputValue)
+        historyVisibleValue.set(historyValue + " " + Command)
+        inputValue = calculation(historyValue)
+        inputVisibleValue.set(inputValue)
+        actionStatus = 2
     #초기화 커멘드일 경우
     elif Command == 'C':
         clearCommand()
@@ -72,8 +96,12 @@ def deleteCommand():
         inputValue = 0
     inputVisibleValue.set(int(inputValue))
 
-def calculation(Command):
+
+
+def calculation(expression):
     return 0
+
+
 
 
 #GUI layout 그리기 시작
@@ -97,10 +125,10 @@ inputArea.grid(column=0, row=1, columnspan=4, ipadx=80, ipady=30)
 layoutIndex = [
     ["","","","<-"],
     ["C","CE","( )","/"],
-    ["7","8","9","x"],
+    ["7","8","9","*"],
     ["4","5","6","-"],
     ["1","2","3","+"],
-    ["+/-","0",".","="]
+    ["","0","","="]
 ]
 for i, layerDetail in enumerate(layoutIndex):
     for k, value in enumerate(layerDetail):
@@ -115,3 +143,4 @@ for i, layerDetail in enumerate(layoutIndex):
         )
         button.grid(column = k, row = (i + 2))
 layout.mainloop()
+
