@@ -1,4 +1,5 @@
 import tkinter as tk
+import algorithm
 
 #히스토리 값 (화면 상단)
 historyValue = ''
@@ -67,7 +68,9 @@ def enterCommand(Command):
     elif Command == '=':
         historyValue = historyValue + " " + str(inputValue)
         historyVisibleValue.set(historyValue + " " + Command)
-        inputValue = calculation(historyValue)
+        # print(historyValue)
+        inputValue = algorithm.processing(historyValue)
+        # print(inputValue)
         inputVisibleValue.set(inputValue)
         actionStatus = 2
     #초기화 커멘드일 경우
@@ -95,13 +98,6 @@ def deleteCommand():
     except:
         inputValue = 0
     inputVisibleValue.set(int(inputValue))
-
-
-
-def calculation(expression):
-    return 0
-
-
 
 
 #GUI layout 그리기 시작
