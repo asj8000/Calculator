@@ -2,9 +2,11 @@ def isInt(value):
     return value.isdigit()
 
 #계산식을 스택으로 관리
+
+
 class Stack:
     def __init__(self):
-        self.data = [] 
+        self.data = []
     def size(self):
         return len(self.data)
     def isEmpty(self):
@@ -17,14 +19,14 @@ class Stack:
         return self.data[-1]
 
 class Calculation:
-    def splitExpression(self,expression):
+    def splitExpression(self, expression):
         expressionList = []
         number = 0
         isNumber = False
         isDecimalPoint = 0
 
-        expression = expression.replace(" ","")
-        
+        expression = expression.replace(" ", "")
+
         for value in expression:
             if isInt(value):
                 value = int(value)
@@ -49,11 +51,11 @@ class Calculation:
             expressionList.append(number)
         return expressionList
 
-    def infixToPostfix(self,expression):
+    def infixToPostfix(self, expression):
         stack = Stack()
         expressionList = []
-        prec = { '*' : 3, '/' : 3, '+' : 2, '-' : 2, '(' : 1 }
-        
+        prec = {'*': 3, '/': 3, '+': 2, '-': 2, '(': 1}
+
         for value in expression:
             try:
                 value = float(value)
@@ -79,9 +81,9 @@ class Calculation:
             expressionList.append(stack.pop())
         return expressionList
 
-    def CalculationPostfix(self,expressionList):
+    def CalculationPostfix(self, expressionList):
         stack = Stack()
-        
+
         for value in expressionList:
             try:
                 #숫자일 경우 스택에 push
@@ -110,8 +112,8 @@ class Calculation:
 
 def processing(expression):
     Cal = Calculation()
-    infix = Cal.splitExpression(expression)#계산식 array로 분리
-    postfix = Cal.infixToPostfix(infix) #계산식을 후위표현식으로 변경
-    result = Cal.CalculationPostfix(postfix)# 후위표현식 계산
+    infix = Cal.splitExpression(expression)  # 계산식 array로 분리
+    postfix = Cal.infixToPostfix(infix)  # 계산식을 후위표현식으로 변경
+    result = Cal.CalculationPostfix(postfix)  # 후위표현식 계산
     result = ("%g" % result)
     return result

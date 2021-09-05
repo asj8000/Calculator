@@ -22,11 +22,13 @@ def clickFunc(value):
         enterCommand(value)
 
 #숫자 입력 시 작동 함수
+
+
 def enterNumber(value):
     global inputValue, actionStatus, isDecimalPoint
     # 현재 무슨 동작을 하고 있냐(actionStatus)를 받아와서
     # 연산자 다음으로 입력되는 숫자일 경우 인풋 창 지우고 새로 입력
-    if actionStatus == 1 :
+    if actionStatus == 1:
         inputValue = int(value)
         inputVisibleValue.set(str(value))
         actionStatus = 0
@@ -50,11 +52,13 @@ def enterNumber(value):
             inputVisibleValue.set(str(inputValue))
 
 #커멘드 입력 시 작동 함수
+
+
 def enterCommand(Command):
     global historyValue, lastValue, inputValue, actionStatus, isDecimalPoint
     isDecimalPoint = 0
     #사칙연산 커멘드일 경우
-    calculationCommentList = ['+','-','*','/']
+    calculationCommentList = ['+', '-', '*', '/']
     if Command in calculationCommentList:
         #결과값을 얻고 그 다음 동작시에 기존 정보들 초기화.
         if actionStatus == 2:
@@ -78,7 +82,7 @@ def enterCommand(Command):
         if isDecimalPoint == 0 or inputValue == 0 or inputValue == '':
             value = str(inputValue) + "."
             inputVisibleValue.set(str(value))
-            isDecimalPoint = 1; 
+            isDecimalPoint = 1
     #연산( = ) 커멘드일 경우
     elif Command == '=':
         historyValue = historyValue + " " + str(inputValue)
@@ -91,11 +95,13 @@ def enterCommand(Command):
     #초기화 커멘드일 경우
     elif Command == 'C':
         clearCommand()
-    #delete 커멘드일 경우 
+    #delete 커멘드일 경우
     elif Command == '<-':
         deleteCommand()
 
 #초기화 함수
+
+
 def clearCommand():
     global historyValue, lastValue, inputValue, actionStatus
     historyValue = ''
@@ -106,6 +112,8 @@ def clearCommand():
     inputVisibleValue.set(str(inputValue))
 
 #지우기 함수
+
+
 def deleteCommand():
     global inputValue
     try:
@@ -118,7 +126,7 @@ def deleteCommand():
 #GUI layout 그리기 시작
 layout = tk.Tk()
 layout.title('계산기')
-layout.resizable(False,False)
+layout.resizable(False, False)
 
 #보여질 히스토리 값과 인풋값 value 셋팅
 historyVisibleValue = tk.StringVar()
@@ -127,31 +135,31 @@ inputVisibleValue = tk.StringVar()
 inputVisibleValue.set(str(inputValue))
 
 #인풋 영역 레이아웃 그리기 시작.
-histroyArea = tk.Entry(layout, textvariable=historyVisibleValue, state="disable", justify="right")
-histroyArea.grid( column=0, row=0, columnspan = 4, ipadx=80,  ipady = 10)
+histroyArea = tk.Entry(
+    layout, textvariable=historyVisibleValue, state="disable", justify="right")
+histroyArea.grid(column=0, row=0, columnspan=4, ipadx=80,  ipady=10)
 inputArea = tk.Entry(layout, textvariable=inputVisibleValue, justify="right")
 inputArea.grid(column=0, row=1, columnspan=4, ipadx=80, ipady=30)
 
 #버튼 영역 레이아웃 그리기 시작
 layoutIndex = [
-    ["","","","<-"],
-    ["C","CE","( )","/"],
-    ["7","8","9","*"],
-    ["4","5","6","-"],
-    ["1","2","3","+"],
-    ["","0",".","="]
+    ["", "", "", "<-"],
+    ["C", "CE", "( )", "/"],
+    ["7", "8", "9", "*"],
+    ["4", "5", "6", "-"],
+    ["1", "2", "3", "+"],
+    ["", "0", ".", "="]
 ]
 for i, layerDetail in enumerate(layoutIndex):
     for k, value in enumerate(layerDetail):
-        button = tk.Button(layout, 
-            text = value, 
-            width = 10,      
-            height = 3,
-            bg = 'white',   
-            fg = 'black',
-            command = lambda 
-            val = value: clickFunc(val)
-        )
-        button.grid(column = k, row = (i + 2))
+        button = tk.Button(layout,
+                           text=value,
+                           width=10,
+                           height=3,
+                           bg='white',
+                           fg='black',
+                           command=lambda
+                           val=value: clickFunc(val)
+                           )
+        button.grid(column=k, row=(i + 2))
 layout.mainloop()
-
