@@ -1,8 +1,5 @@
-def isInteger(value):
-    if value[0] == ('-', '+'):
-        return value[1:].isdigit()
-    else:
-        return value.isdigit()
+def isInt(value):
+    return value.isdigit()
 
 #계산식을 스택으로 관리
 class Stack:
@@ -21,43 +18,52 @@ class Stack:
 
 class Calculation:
     def splitExpression(self,expression):
-        expressionArray = []
+        expressionList = []
         number = 0
         isNumber = False
+        isDecimalPoint = 0
 
         expression = expression.replace(" ","")
         
         for value in expression:
-            try:
+            if isInt(value):
                 value = int(value)
-                Number = Number * 10 + int(value)
+                if isDecimalPoint != 0:
+                    for i in range(isDecimalPoint):
+                        value = value / 10
+                    number = number + value
+                    isDecimalPoint += 1
+                else:
+                    number = number * 10 + int(value)
                 isNumber = True
-            except:
+            elif value == ".":
+                isDecimalPoint = 1
+            else:
                 if isNumber:
-                    expressionArray.append(number)
+                    expressionList.append(number)
                     number = 0
                 isNumber = False
-                expressionArray.append(value)        
-        return expressionArray
+                isDecimalPoint = 0
+                expressionList.append(value)
+        if isNumber == True:
+            expressionList.append(number)
+        return expressionList
 
     def infixToPostfix(self,expression):
         stack = Stack()
-        expressionArray = []
+        expressionList = []
         prec = { '*' : 3, '/' : 3, '+' : 2, '-' : 2, '(' : 1 }
         
         for value in expression:
             try:
-                #숫자일 경우 입력
-                value = int(value)
-                expressionArray.append(value)
+                value = float(value)
+                expressionList.append(value)
             except:
-                #시작 괄호일 경우 입력
                 if value == '(':
                     stack.push(value)
-                #종료 괄호일 경우 입력
                 elif value == ')':
                     while stack.peek() != '(':
-                        expressionArray.append(stack.pop())
+                        expressionList.append(stack.pop())
                     stack.pop()
                 else:
                     if stack.isEmpty():
@@ -65,21 +71,21 @@ class Calculation:
                     else:
                         while stack.size() > 0:
                             if prec[stack.peek()] >= prec[value]:
-                                expressionArray.append(stack.pop())
+                                expressionList.append(stack.pop())
                             else:
                                 break
                         stack.push(value)
         while not stack.isEmpty():
-            expressionArray.append(stack.pop())
-        return expressionArray
+            expressionList.append(stack.pop())
+        return expressionList
 
-    def CalculationPostfix(self,expressionArray):
+    def CalculationPostfix(self,expressionList):
         stack = Stack()
         
-        for value in expressionArray:
+        for value in expressionList:
             try:
                 #숫자일 경우 스택에 push
-                value = int(value)
+                value = float(value)
                 stack.push(value)
             except:
                 # 그 외 연산자 처리
@@ -104,7 +110,8 @@ class Calculation:
 
 def processing(expression):
     Cal = Calculation()
-    tokens = Cal.splitExpression(expression)#계산식 array로 분리
-    postfix = Cal.infixToPostfix(tokens) #계산식을 후위표현식으로 변경
-    val = Cal.CalculationPostfix(postfix)# 후위표현식 계산
-    return val
+    infix = Cal.splitExpression(expression)#계산식 array로 분리
+    postfix = Cal.infixToPostfix(infix) #계산식을 후위표현식으로 변경
+    result = Cal.CalculationPostfix(postfix)# 후위표현식 계산
+    result = ("%g" % result)
+    return result

@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter.constants import PROJECTING
 import algorithm
 
 #히스토리 값 (화면 상단)
@@ -10,6 +11,7 @@ lastValue = ''
 inputValue = 0
 #현재 작동
 actionStatus = 0
+isDecimalPoint = 0
 
 
 #버튼 클릭 시 작동
@@ -21,7 +23,7 @@ def clickFunc(value):
 
 #숫자 입력 시 작동 함수
 def enterNumber(value):
-    global inputValue, actionStatus
+    global inputValue, actionStatus, isDecimalPoint
     # 현재 무슨 동작을 하고 있냐(actionStatus)를 받아와서
     # 연산자 다음으로 입력되는 숫자일 경우 인풋 창 지우고 새로 입력
     if actionStatus == 1 :
@@ -36,34 +38,47 @@ def enterNumber(value):
         actionStatus = 0
     # 숫자를 처음 or 연속으로 입력할 경우 기존 숫자에 다음에 추가
     else:
-        inputValue = (inputValue*10) + int(value)
-        inputVisibleValue.set(str(inputValue))
+        print(isDecimalPoint)
+        if isDecimalPoint != 0:
+            for i in range(isDecimalPoint):
+                value = float(value) / 10
+            inputValue = inputValue + float(value)
+            inputVisibleValue.set(str(inputValue))
+            isDecimalPoint += 1
+        else:
+            inputValue = (inputValue*10) + int(value)
+            inputVisibleValue.set(str(inputValue))
 
 #커멘드 입력 시 작동 함수
 def enterCommand(Command):
-    global historyValue, lastValue, inputValue, actionStatus
-
-    if actionStatus == 2:
-        beforeResult = inputValue
-        clearCommand()
-        historyValue = str(beforeResult) + " " + Command
-        historyVisibleValue.set(str(historyValue))
-        inputVisibleValue.set(int(0))
-        return
-
+    global historyValue, lastValue, inputValue, actionStatus, isDecimalPoint
+    isDecimalPoint = 0
     #사칙연산 커멘드일 경우
     calculationCommentList = ['+','-','*','/']
     if Command in calculationCommentList:
-        #커멘드를 연속으로 입력할 경우 예외처리
-        if actionStatus == 1:
+        #결과값을 얻고 그 다음 동작시에 기존 정보들 초기화.
+        if actionStatus == 2:
+            beforeResult = inputValue
+            clearCommand()
+            historyValue = str(beforeResult) + " " + Command
+            historyVisibleValue.set(str(historyValue))
+            inputVisibleValue.set(str(0))
+        #커멘드를 연속으로 입력할 경우 예외처리 (기존 입력 커멘드 제거하고 새 입력 커멘드로 변경)
+        elif actionStatus == 1:
             historyValue = lastValue + " " + str(inputValue) + " " + Command
             historyVisibleValue.set(str(historyValue))
         else:
             lastValue = historyValue
             historyValue = historyValue + " " + str(inputValue) + " " + Command
             historyVisibleValue.set(str(historyValue))
-            inputVisibleValue.set(int(0))
+            inputVisibleValue.set(str(0))
         actionStatus = 1
+    #소숫점( . ) 커멘드일 경우
+    elif Command == '.':
+        if isDecimalPoint == 0 or inputValue == 0 or inputValue == '':
+            value = str(inputValue) + "."
+            inputVisibleValue.set(str(value))
+            isDecimalPoint = 1; 
     #연산( = ) 커멘드일 경우
     elif Command == '=':
         historyValue = historyValue + " " + str(inputValue)
@@ -76,7 +91,7 @@ def enterCommand(Command):
     #초기화 커멘드일 경우
     elif Command == 'C':
         clearCommand()
-    #delete 커멘드일 경우
+    #delete 커멘드일 경우 
     elif Command == '<-':
         deleteCommand()
 
@@ -87,7 +102,7 @@ def clearCommand():
     lastValue = ''
     inputValue = 0
     actionStatus = 0
-    historyVisibleValue.set(str(historyValue))
+    historyVisibleValue.set(str(''))
     inputVisibleValue.set(str(inputValue))
 
 #지우기 함수
@@ -97,7 +112,7 @@ def deleteCommand():
         inputValue = int(str(inputValue)[:-1])
     except:
         inputValue = 0
-    inputVisibleValue.set(int(inputValue))
+    inputVisibleValue.set(str(inputValue))
 
 
 #GUI layout 그리기 시작
@@ -124,7 +139,7 @@ layoutIndex = [
     ["7","8","9","*"],
     ["4","5","6","-"],
     ["1","2","3","+"],
-    ["","0","","="]
+    ["","0",".","="]
 ]
 for i, layerDetail in enumerate(layoutIndex):
     for k, value in enumerate(layerDetail):
