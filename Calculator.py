@@ -10,8 +10,8 @@ lastValue = ''
 #현재 입력된 값
 inputValue = 0
 #현재 작동
-actionStatus = 0
-isDecimalPoint = 0
+actionStatus = 0  #이전 동작. 0 : clear, 1 : number, 1 : 연산자, 2 : result
+isDecimalPoint = 0 #소숫점 입력 시 자릿수 체크용
 
 
 #버튼 클릭 시 작동
@@ -22,12 +22,11 @@ def clickFunc(value):
         enterCommand(value)
 
 #숫자 입력 시 작동 함수
-
-
 def enterNumber(value):
     global inputValue, actionStatus, isDecimalPoint
     # 현재 무슨 동작을 하고 있냐(actionStatus)를 받아와서
-    # 연산자 다음으로 입력되는 숫자일 경우 인풋 창 지우고 새로 입력
+
+    # 연산자 바로 다음으로 입력되는 숫자일 경우 인풋 창 지우고 새로 입력
     if actionStatus == 1:
         inputValue = int(value)
         inputVisibleValue.set(str(value))
@@ -40,7 +39,7 @@ def enterNumber(value):
         actionStatus = 0
     # 숫자를 처음 or 연속으로 입력할 경우 기존 숫자에 다음에 추가
     else:
-        print(isDecimalPoint)
+        # 숫자가 소수점일 경우. 소수점 연산
         if isDecimalPoint != 0:
             for i in range(isDecimalPoint):
                 value = float(value) / 10
@@ -52,14 +51,14 @@ def enterNumber(value):
             inputVisibleValue.set(str(inputValue))
 
 #커멘드 입력 시 작동 함수
-
-
 def enterCommand(Command):
     global historyValue, lastValue, inputValue, actionStatus, isDecimalPoint
-    isDecimalPoint = 0
-    #사칙연산 커멘드일 경우
-    calculationCommentList = ['+', '-', '*', '/']
-    if Command in calculationCommentList:
+
+    isDecimalPoint = 0 #소숫점 여부 초기화
+
+    #연산자 커멘드일 경우
+    calculationCommandList = ['+', '-', '*', '/']
+    if Command in calculationCommandList:
         #결과값을 얻고 그 다음 동작시에 기존 정보들 초기화.
         if actionStatus == 2:
             beforeResult = inputValue
@@ -71,6 +70,7 @@ def enterCommand(Command):
         elif actionStatus == 1:
             historyValue = lastValue + " " + str(inputValue) + " " + Command
             historyVisibleValue.set(str(historyValue))
+        #연산 커멘드를 입력할 경우.
         else:
             lastValue = historyValue
             historyValue = historyValue + " " + str(inputValue) + " " + Command
@@ -79,10 +79,18 @@ def enterCommand(Command):
         actionStatus = 1
     #소숫점( . ) 커멘드일 경우
     elif Command == '.':
+
         if isDecimalPoint == 0 or inputValue == 0 or inputValue == '':
-            value = str(inputValue) + "."
-            inputVisibleValue.set(str(value))
-            isDecimalPoint = 1
+            
+            if actionStatus == 2 and inputValue - int(inputValue) != 0:
+                isDecimalPoint = 1
+            else:
+                value = str(inputValue) + "."
+                inputVisibleValue.set(str(value))
+                isDecimalPoint = 1
+    #괄호( ( ) ) 커멘드일 경우
+    elif Command == '( )':
+        print('aa')
     #연산( = ) 커멘드일 경우
     elif Command == '=':
         historyValue = historyValue + " " + str(inputValue)
@@ -98,6 +106,7 @@ def enterCommand(Command):
     #delete 커멘드일 경우
     elif Command == '<-':
         deleteCommand()
+
 
 #초기화 함수
 
@@ -144,7 +153,7 @@ inputArea.grid(column=0, row=1, columnspan=4, ipadx=80, ipady=30)
 #버튼 영역 레이아웃 그리기 시작
 layoutIndex = [
     ["", "", "", "<-"],
-    ["C", "CE", "( )", "/"],
+    ["C", "", "( )", "/"],
     ["7", "8", "9", "*"],
     ["4", "5", "6", "-"],
     ["1", "2", "3", "+"],
