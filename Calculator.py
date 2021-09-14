@@ -4,11 +4,13 @@ import algorithm
 
 #히스토리 값 (화면 상단)
 historyValue = ''
-#이전 히스토리 값
-lastValue = ''
+#직전 히스토리 값
+lastHistoryValueValue = ''
 
 #현재 입력된 값
 inputValue = 0
+#현재 입력된 값
+lastInputValue = 0
 #현재 작동
 actionStatus = 0  #이전 동작. 0 : clear, 1 : number, 1 : 연산자, 2 : result
 isDecimalPoint = 0 #소숫점 입력 시 자릿수 체크용
@@ -52,7 +54,7 @@ def enterNumber(value):
 
 #커멘드 입력 시 작동 함수
 def enterCommand(Command):
-    global historyValue, lastValue, inputValue, actionStatus, isDecimalPoint
+    global historyValue, lastHistoryValue, inputValue, actionStatus, isDecimalPoint
 
     isDecimalPoint = 0 #소숫점 여부 초기화
 
@@ -68,20 +70,18 @@ def enterCommand(Command):
             inputVisibleValue.set(str(0))
         #커멘드를 연속으로 입력할 경우 예외처리 (기존 입력 커멘드 제거하고 새 입력 커멘드로 변경)
         elif actionStatus == 1:
-            historyValue = lastValue + " " + str(inputValue) + " " + Command
+            historyValue = lastHistoryValue + " " + Command
             historyVisibleValue.set(str(historyValue))
         #연산 커멘드를 입력할 경우.
         else:
-            lastValue = historyValue
+            lastHistoryValue = historyValue + " " + str(inputValue)
             historyValue = historyValue + " " + str(inputValue) + " " + Command
             historyVisibleValue.set(str(historyValue))
             inputVisibleValue.set(str(0))
         actionStatus = 1
     #소숫점( . ) 커멘드일 경우
     elif Command == '.':
-
         if isDecimalPoint == 0 or inputValue == 0 or inputValue == '':
-            
             if actionStatus == 2 and inputValue - int(inputValue) != 0:
                 isDecimalPoint = 1
             else:
@@ -93,11 +93,12 @@ def enterCommand(Command):
         print('aa')
     #연산( = ) 커멘드일 경우
     elif Command == '=':
-        historyValue = historyValue + " " + str(inputValue)
+        if actionStatus == 1:
+            historyValue = lastHistoryValue
+        else:
+            historyValue = historyValue + " " + str(inputValue)
         historyVisibleValue.set(historyValue + " " + Command)
-        # print(historyValue)
         inputValue = algorithm.processing(historyValue)
-        # print(inputValue)
         inputVisibleValue.set(inputValue)
         actionStatus = 2
     #초기화 커멘드일 경우
@@ -112,9 +113,9 @@ def enterCommand(Command):
 
 
 def clearCommand():
-    global historyValue, lastValue, inputValue, actionStatus
+    global historyValue, lastHistoryValue, inputValue, actionStatus
     historyValue = ''
-    lastValue = ''
+    lastHistoryValue = ''
     inputValue = 0
     actionStatus = 0
     historyVisibleValue.set(str(''))
